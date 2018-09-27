@@ -1,24 +1,50 @@
 #!/bin/bash
 
+f=$(which fastboot)
+
 clear
+
+## Opening statements
+opnstmnt(){
 echo "obliteratam's small modifications to:"
 echo "Deuces-flash-all-script-V4.4-Linux"
 echo "for Taimen & Walleye - Google Pixel 2 / XL"
 echo "USE AT YOUR OWN RISK"
 echo "THIS HAS NOT BEEN TESTED ON MAC / OSX"
 read -n1 -r -p "Press any key to continue..." key
+clear
 
 echo "Make Sure your Device is in Fastboot Mode"
 echo "(Power off, hold Volume-Down, hold Power)"
 echo "Once you are in fastboot,"
 read -n1 -r -p "Press any key to continue..." key
 clear
+}
+
+##Prep
+#mkdir for .imgs and extract zipped images
+prep(){
+ls | grep *.zip > fldr.temp
+sed 's/.zip//' fldr.temp
+mkdir -pv $(cat fldr.temp)/images
+unzip -d $(cat fldr.temp) $(cat fldr.temp).zip
+
+pushd $(cat fldr.temp)
+unzip -d images/ *.zip
+
+pushd $PWD/images
+# Get list of images
+ls | grep *.img > images.temp
+sed 's/system*//' images.temp
+sed 's/.img//' images.temp
+popd
+popd
+clear
+}
+
 ##choices-Bootloader-Unlocking
-
-f=$(which fastboot)
-
-echo -n "Unlock Bootloader? (y/n)"
-read answer
+unlkbtldr(){
+read -p "Unlock Bootloader? (y/n)" answer
 if echo "$answer" | grep -iq "^y" ;then
     echo "Running Unlock"
     echo "Look at your device,"
@@ -36,8 +62,13 @@ if echo "$answer" | grep -iq "^y" ;then
 else
     echo "Skipping unlock(s)"
 fi
+clear
+}
 
-echo "Flashing Bootloader & Radio A&B"
+## Flash bootloader and radio modem
+flblr(){
+pushd $(cat folder.temp)
+echo "Flashing Bootloader & Radio A&B..."
 sudo $f flash bootloader_a bootloader*.img
 sudo $f reboot-bootloader
 sleep 5
@@ -50,62 +81,42 @@ sleep 5
 sudo $f flash radio_b radio*.img
 sudo $f reboot-bootloader
 sleep 5
+popd
+clear
+}
 
-echo "Flashing All Others -- Without Reboot"
+
+## Flash images
+flash(){
+pushd $(cat fldr.temp)/images
+# Flash Partition A
 sudo $f --set-active=a
+echo "Flashing Partition A..."
+for i in $(cat images.temp); do
+    sudo $f flash "$i"_a "$i".img;
+done
+sudo flash $f system_a system.img
 
-##Flashing Slot A
-sudo $f flash abl_a abl.img
-sudo $f flash aes_a aes.img
-sudo $f flash apdp_a apdp.img
-sudo $f flash boot_a boot.img
-sudo $f flash cmnlib_a cmnlib.img
-sudo $f flash cmnlib64_a cmnlib64.img
-sudo $f flash devcfg_a devcfg.img
-sudo $f flash dtbo_a dtbo.img
-sudo $f flash hyp_a hyp.img
-sudo $f flash keymaster_a keymaster.img
-sudo $f flash laf_a laf.img
-sudo $f flash modem_a modem.img
-sudo $f flash msadp_a msadp.img
-sudo $f flash pmic_a pmic.img
-sudo $f flash rpm_a rpm.img
-sudo $f flash tz_a tz.img
-sudo $f flash vbmeta_a vbmeta.img
-sudo $f flash vendor_a vendor.img
-sudo $f flash xbl_a xbl.img
-
-echo "Flashing System A"
-sudo $f flash system_a system.img
-echo "Flashing System B"
+# Flash Partition B
+sudo $f --set-active=b
+echo "Flashing partition B..."
+for i in $(cat images.temp); do
+    sudo $f flash "$i"_b "$i".img
+done
 sudo $f flash system_b system_other.img
 
-##Flashing Slot B
-sudo $f --set-active=b
-sudo $f flash abl_b abl.img
-sudo $f flash aes_b aes.img
-sudo $f flash apdp_b apdp.img
-sudo $f flash boot_b boot.img
-sudo $f flash cmnlib_b cmnlib.img
-sudo $f flash cmnlib64_b cmnlib64.img
-sudo $f flash devcfg_b devcfg.img
-sudo $f flash dtbo_b dtbo.img
-sudo $f flash hyp_b hyp.img
-sudo $f flash keymaster_b keymaster.img
-sudo $f flash laf_b laf.img
-sudo $f flash modem_b modem.img
-sudo $f flash msadp_b msadp.img
-sudo $f flash pmic_b pmic.img
-sudo $f flash rpm_b rpm.img
-sudo $f flash tz_b tz.img
-sudo $f flash vbmeta_b vbmeta.img
-sudo $f flash vendor_b vendor.img
-sudo $f flash xbl_b xbl.img
-
 sudo $f --set-active=a
+rm -v images.temp
+popd
+clear
+}
 
-##choices-format-relocks
+rmfldrtemp(){
+rm fldr.temp
+}
 
+## Format user data prompt
+frmtdt(){
 echo -n "FORMAT USERDATA? (y/n)"
 read answer
 if echo "$answer" | grep -iq "^y" ;then
@@ -116,8 +127,10 @@ else
 fi
 echo "Finished Flashing... if you are still having bootloops, you may need to format userdata in factory recovery"
 echo "DO NOT LOCK THE BOOTLOADER UNLESS YOU ARE SURE IT IS OPERATING PROPERLY"
+}
 
-
+## Reboot system prompt
+rbtsys(){
 read -p "Reboot system? Enter [y/N]" cont
 case $cont in
 	[Yy*]) echo Rebooting to system...
@@ -126,3 +139,16 @@ case $cont in
 	[Nn*]) echo "ok..."
 		;;
 esac
+}
+
+#####################
+# The whole shebang #
+#####################
+opnstmnt
+prep
+unlkbtldr
+flblr
+flash
+rmfldrtemp
+frmtdt
+rbtsys
