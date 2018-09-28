@@ -33,20 +33,15 @@ clear
 ##Prep
 #mkdir for .imgs and extract zipped images
 prep(){
-ls | grep *.zip > fldr.temp
-sed 's/.zip//' fldr.temp
-mkdir -pv $(cat fldr.temp)/images
-unzip -d $(cat fldr.temp) $(cat fldr.temp).zip
+archive=$(ls | grep *.zip)
+nwfldrdir=$(ls | grep *.zip | sed 's/-factory.*//')
 
-pushd $(cat fldr.temp)
-unzip -d images/ *.zip
-
-pushd $PWD/images
-# Get list of images
-ls | grep *.img > images.temp
-sed 's/system*//' images.temp
-sed 's/.img//' images.temp
-popd
+unzip $archive */bootloader* */image* */radio*
+pushd $nwfldrdir
+    mkdir images/
+    unzip *.zip -x android-info.txt -d images/
+    # Get list of images
+    images=$(ls images/ | sed 's/system.*//' | sed '/^$/d')
 popd
 clear
 }
@@ -76,20 +71,20 @@ clear
 
 ## Flash bootloader and radio modem
 flblr(){
-pushd $(cat folder.temp)
-echo "Flashing Bootloader & Radio A&B..."
-sudo $f flash bootloader_a bootloader*.img
-sudo $f reboot-bootloader
-sleep 5
-sudo $f flash bootloader_b bootloader*.img
-sudo $f reboot-bootloader
-sleep 5
-sudo $f flash radio_a radio*.img
-sudo $f reboot-bootloader
-sleep 5
-sudo $f flash radio_b radio*.img
-sudo $f reboot-bootloader
-sleep 5
+pushd $nwfldrdir
+    echo "Flashing Bootloader & Radio A&B..."
+    sudo $f flash bootloader_a bootloader*.img
+    sudo $f reboot-bootloader
+    sleep 5
+    sudo $f flash bootloader_b bootloader*.img
+    sudo $f reboot-bootloader
+    sleep 5
+    sudo $f flash radio_a radio*.img
+    sudo $f reboot-bootloader
+    sleep 5
+    sudo $f flash radio_b radio*.img
+    sudo $f reboot-bootloader
+    sleep 5
 popd
 clear
 }
@@ -97,31 +92,21 @@ clear
 
 ## Flash images
 flash(){
-pushd $(cat fldr.temp)/images
 # Flash Partition A
-sudo $f --set-active=a
 echo "Flashing Partition A..."
-for i in $(cat images.temp); do
-    sudo $f flash "$i"_a "$i".img;
+for i in $images; do
+    sudo $f flash $( echo $i | sed 's/.img//' )_a $nwfldrdir/images/$i;
 done
-sudo flash $f system_a system.img
+sudo flash $f system_a $nwfldrdir/images/system.img
+clear
 
 # Flash Partition B
-sudo $f --set-active=b
 echo "Flashing partition B..."
-for i in $(cat images.temp); do
-    sudo $f flash "$i"_b "$i".img
+for i in $images; do
+    sudo $f flash $( echo $i | sed 's/.img//' )_b $nwfldrdir/images/$i;
 done
-sudo $f flash system_b system_other.img
-
-sudo $f --set-active=a
-rm -v images.temp
-popd
+sudo $f flash system_b $nwfldrdir/images/system_other.img
 clear
-}
-
-rmfldrtemp(){
-rm fldr.temp
 }
 
 ## Format user data prompt
@@ -158,6 +143,5 @@ prep
 unlkbtldr
 flblr
 flash
-rmfldrtemp
 frmtdt
 rbtsys
