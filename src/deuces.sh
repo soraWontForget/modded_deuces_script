@@ -14,6 +14,15 @@ echo "THIS HAS NOT BEEN TESTED ON MAC / OSX"
 read -n1 -r -p "Press any key to continue..." key
 clear
 
+echo "Make sure you've changed your working directory to the"
+echo "directory where your archived factory image resides"
+echo "Make sure the archive is the only archive in the directory."
+echo "before you execute this script."
+echo "There's no need to extract the archive yourself."
+echo "The script will take care of that for you."
+read -n1 -r -p "Press any key to continue..." key
+clear
+
 echo "Make Sure your Device is in Fastboot Mode"
 echo "(Power off, hold Volume-Down, hold Power)"
 echo "Once you are in fastboot,"
@@ -136,7 +145,7 @@ case $cont in
 	[Yy*]) echo Rebooting to system...
 		sudo $f continue
 		;;
-	[Nn*]) echo "ok..."
+	[Nn*]) echo "Staying in fastboot mode..."
 		;;
 esac
 }
