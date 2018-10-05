@@ -6,7 +6,7 @@ clear
 
 ## Opening statements
 openingStatement(){
-echo "obliteratam's small modifications to:"
+echo "soraWontForget's small modifications to:"
 echo "Deuces-flash-all-script-V4.4-Linux"
 echo "for Taimen & Walleye - Google Pixel 2 / XL"
 echo "USE AT YOUR OWN RISK"
