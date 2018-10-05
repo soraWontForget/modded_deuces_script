@@ -34,10 +34,10 @@ clear
 #mkdir for .imgs and extract zipped images
 prep(){
 archive=$(ls | grep *.zip)
-nwfldrdir=$(ls | grep *.zip | sed 's/-factory.*//')
+newFolderDirectory=$(ls | grep *.zip | sed 's/-factory.*//')
 
 unzip $archive */bootloader* */image* */radio*
-pushd $nwfldrdir
+pushd $newFolderDirectory
     mkdir images/
     unzip *.zip -x android-info.txt -d images/
     # Get list of images
@@ -71,7 +71,7 @@ clear
 
 ## Flash bootloader and radio modem
 flashBootloaderAndRadio(){
-pushd $nwfldrdir
+pushd $newFolderDirectory
     echo "Flashing Bootloader & Radio A&B..."
     sudo $f flash bootloader_a bootloader*.img
     sudo $f reboot-bootloader
@@ -94,25 +94,32 @@ clear
 flashPartitions(){
 # Flash Partition A
 echo "Flashing Partition A..."
-sudo $f set-active=a
+setActiveSlotA
 for i in $images; do
-    sudo $f flash $( echo $i | sed 's/.img//' )_a $nwfldrdir/images/$i;
+    sudo $f flash $( echo $i | sed 's/.img//' )_a $newFolderDirectory/images/$i;
 done
-sudo flash $f system_a $nwfldrdir/images/system.img
+sudo flash $f system_a $newFolderDirectory/images/system.img
 clear
 
 # Flash Partition B
 echo "Flashing partition B..."
-sudo $f --set-active=b
+setActiveSlotB
 for i in $images; do
-    sudo $f flash $( echo $i | sed 's/.img//' )_b $nwfldrdir/images/$i;
+    sudo $f flash $( echo $i | sed 's/.img//' )_b $newFolderDirectory/images/$i;
 done
-sudo $f flash system_b $nwfldrdir/images/system_other.img
+sudo $f flash system_b $newFolderDirectory/images/system_other.img
 clear
 }
 
+## Set the active boot partitions
+# Set active partition A
 setActiveSlotA(){
 sudo $f --set-active=a
+}
+
+# Set active partition B
+setActiveSlotB(){
+sudo $f --set-active=b
 }
 
 ## Format user data prompt
@@ -130,7 +137,7 @@ echo "DO NOT LOCK THE BOOTLOADER UNLESS YOU ARE SURE IT IS OPERATING PROPERLY"
 }
 
 ## Reboot system prompt
-rebootSystemPrompt (){
+rebootSystemPrompt(){
 read -p "Reboot system? Enter [y/N]" cont
 case $cont in
 	[Yy*]) echo Rebooting to system...
