@@ -5,7 +5,7 @@ f=$(which fastboot)
 clear
 
 ## Opening statements
-opnstmnt(){
+openingStatement(){
 echo "obliteratam's small modifications to:"
 echo "Deuces-flash-all-script-V4.4-Linux"
 echo "for Taimen & Walleye - Google Pixel 2 / XL"
@@ -47,7 +47,7 @@ clear
 }
 
 ##choices-Bootloader-Unlocking
-unlkbtldr(){
+unlockBootloader(){
 read -p "Unlock Bootloader? (y/n)" answer
 if echo "$answer" | grep -iq "^y" ;then
     echo "Running Unlock"
@@ -70,7 +70,7 @@ clear
 }
 
 ## Flash bootloader and radio modem
-flblr(){
+flashBootloaderAndRadio(){
 pushd $nwfldrdir
     echo "Flashing Bootloader & Radio A&B..."
     sudo $f flash bootloader_a bootloader*.img
@@ -91,9 +91,10 @@ clear
 
 
 ## Flash images
-flash(){
+flashPartitions(){
 # Flash Partition A
 echo "Flashing Partition A..."
+sudo $f set-active=a
 for i in $images; do
     sudo $f flash $( echo $i | sed 's/.img//' )_a $nwfldrdir/images/$i;
 done
@@ -102,6 +103,7 @@ clear
 
 # Flash Partition B
 echo "Flashing partition B..."
+sudo $f --set-active=b
 for i in $images; do
     sudo $f flash $( echo $i | sed 's/.img//' )_b $nwfldrdir/images/$i;
 done
@@ -109,8 +111,12 @@ sudo $f flash system_b $nwfldrdir/images/system_other.img
 clear
 }
 
+setActiveSlotA(){
+sudo $f --set-active=a
+}
+
 ## Format user data prompt
-frmtdt(){
+formatUserData(){
 echo -n "FORMAT USERDATA? (y/n)"
 read answer
 if echo "$answer" | grep -iq "^y" ;then
@@ -124,7 +130,7 @@ echo "DO NOT LOCK THE BOOTLOADER UNLESS YOU ARE SURE IT IS OPERATING PROPERLY"
 }
 
 ## Reboot system prompt
-rbtsys(){
+rebootSystemPrompt (){
 read -p "Reboot system? Enter [y/N]" cont
 case $cont in
 	[Yy*]) echo Rebooting to system...
@@ -138,10 +144,11 @@ esac
 #####################
 # The whole shebang #
 #####################
-opnstmnt
+openingStatement
 prep
-unlkbtldr
-flblr
-flash
-frmtdt
-rbtsys
+unlockBootloader
+flashBootloaderAndRadio
+flashPartitions
+setActiveSlotA
+formatUserData
+rebootSystemPrompt
