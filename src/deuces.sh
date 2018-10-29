@@ -31,7 +31,7 @@ echo -en "\n"
 
 echo -en "\n"
 echo -en "\n"
-echo "Make sure your Device is in Fastboot Mode"
+echo "Make sure your device is in Fastboot Mode"
 echo "(Power off, hold Volume-Down, hold Power)"
 echo "Once you are in fastboot,"
 read -n1 -r -p "Press any key to continue..." key
@@ -52,7 +52,7 @@ pushd $newFolderDirectory
     mkdir images/
     unzip *.zip -x android-info.txt -d images/
     # Get list of images
-    images=$(ls images/ | sed 's/system.*//' | sed '/^$/d')
+    images=$(ls images/ | sed 's/system*.*//' | sed '/^$/d')
 popd
 }
 
@@ -90,7 +90,7 @@ pushd $newFolderDirectory
     echo -en "\n"
     echo -en "\n"
     echo "If the script hangs at:"
-    echo ""< waiting for any device >""
+    echo "'< waiting for any device >'"
     echo "Unplug your device from your usb cable,"
     echo "and then plug it back in."
     echo -en "\n"
@@ -136,7 +136,7 @@ for i in $images; do
     sleep 2;
 done
 sleep 2;
-sudo flash $f system_a $newFolderDirectory/images/system.img
+sudo $f flash system_a $newFolderDirectory/images/system.img;
 
 # Flash Partition B
 echo -en "\n"
@@ -149,7 +149,7 @@ for i in $images; do
     sleep 2;
 done
 sleep 2;
-sudo $f flash system_b $newFolderDirectory/images/system_other.img
+sudo $f flash system_b $newFolderDirectory/images/system_other.img;
 }
 
 ## Set the active boot partitions
