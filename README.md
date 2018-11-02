@@ -1,10 +1,26 @@
-Instructions:
+A BASH script for Google Nexus and Pixel devices to unlock/lock the bootloader, download factory images, flash factory images, install TWRP, install custom kernels, and enable root access.
 
-1. Make seperate folders for each release of the factory image archive, and keep only one archive in the directory. The script will otherwise extract all zip files inside the directory it was executed in, and act only on the first extraction.
+Many features are not available yet.
+ 
+ 
+##Instructions:
 
-2. Either add the script to a directory in your path, or move the script to the directory of your archived factory images and execute from there. Check environment variables with echo $PATH.
+1. Run the script in a terminal using './' without the apostrophes. 
 
-3. Follow prompts.
+2. Follow prompts.
 
-4. Move on with your life.
+3. Do a dance.
 
+#####Working:
+
+1. Flash and extract downloaded factory images from archive
+
+2. Unlock bootloader
+
+#####WIP:
+1. Download factory images
+
+2. Lock bootloader
+
+3. Install/Uninstall Root/TWRP/Custom Kernel
+ 
