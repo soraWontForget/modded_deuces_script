@@ -5,7 +5,7 @@ Many features are not available yet.
  
 ## Instructions:
 
-1. Run the script in a terminal using './' without the apostrophes. 
+1.Add executable somewhere in your enviornment variable path, or in the same directory as your factory image archive.  Run the script in a terminal using './' without the apostrophes. 
 
 2. Follow prompts.
 
