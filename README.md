@@ -3,7 +3,7 @@ A BASH script for Google Nexus and Pixel devices to unlock/lock the bootloader, 
 Many features are not available yet.
  
  
-##Instructions:
+## Instructions:
 
 1. Run the script in a terminal using './' without the apostrophes. 
 
@@ -11,13 +11,13 @@ Many features are not available yet.
 
 3. Do a dance.
 
-#####Working:
+##### Working:
 
 1. Flash and extract downloaded factory images from archive
 
 2. Unlock bootloader
 
-#####WIP:
+##### WIP:
 1. Download factory images
 
 2. Lock bootloader
